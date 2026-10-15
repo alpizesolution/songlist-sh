@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>SongHub Songbook</title>
-<meta name="description" content="Browse 42,772 SongHub karaoke songs by title A–Z or by singer.">
+<meta name="description" content="Browse 47,998 SongHub karaoke songs by title A–Z or by singer.">
 <meta name="theme-color" content="#f5f3f7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#141118" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -67,7 +67,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-off
 .back{font:inherit;font-weight:600;border:0;background:none;color:var(--accent);cursor:pointer;padding:0;margin-top:18px}
 ol.songs{list-style:none;margin:0;padding:0}
 ol.songs li{display:grid;grid-template-columns:auto 1fr;gap:2px 14px;align-items:baseline;padding:10px 4px;border-bottom:1px solid var(--line)}
-.code{grid-row:span 2;font-family:var(--mono);font-weight:700;font-size:17px;color:var(--code);background:none;border:0;padding:2px 0;cursor:pointer;width:5.4ch;text-align:left;font-variant-numeric:tabular-nums;align-self:center}
+.code{grid-row:span 2;font-family:var(--mono);font-weight:700;font-size:17px;color:var(--code);background:none;border:0;padding:2px 0;cursor:pointer;width:6.4ch;text-align:left;font-variant-numeric:tabular-nums;align-self:center}
 .code:hover{color:var(--accent)}
 .t{font-weight:600;min-width:0;overflow-wrap:anywhere}
 .a{font-size:13px;color:var(--muted);min-width:0;overflow-wrap:anywhere}
@@ -166,8 +166,8 @@ function search(q){
   if(searchCache&&searchCache.q===q)return searchCache;
   const isNum=/^\d+$/.test(q);const songs=[];const singers=[];
   for(let i=0;i<SONGS.length;i++){
-    if(titleLC[i].includes(q)||artistLC[SONGS[i][2]].includes(q)||(isNum&&String(SONGS[i][0]).startsWith(q)))songs.push(i)}
-  if(isNum)songs.sort((a,b)=>{const ea=String(SONGS[a][0])===q,eb=String(SONGS[b][0])===q;return eb-ea});
+    if(titleLC[i].includes(q)||artistLC[SONGS[i][2]].includes(q)||(isNum&&(SONGS[i][0].startsWith(q)||SONGS[i][0].replace(/^0+/,'').startsWith(q))))songs.push(i)}
+  if(isNum)songs.sort((a,b)=>{const ea=+SONGS[a][0]===+q,eb=+SONGS[b][0]===+q;return eb-ea});
   for(let i=0;i<ARTISTS.length;i++)if(artistLC[i].includes(q))singers.push(i);
   singers.sort((a,b)=>bySinger[b].length-bySinger[a].length);
   return searchCache={q,songs,singers}}

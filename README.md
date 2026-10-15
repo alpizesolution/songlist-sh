@@ -1,6 +1,6 @@
 # SongHub Songbook
 
-A fast, installable (PWA) songlist for SongHub's 42,772 karaoke songs. Browse titles A–Z, browse by singer, or search by title, singer or song number. Tap a song number to copy it. Works offline after the first visit.
+A fast, installable (PWA) songlist for SongHub's 47,998 karaoke songs. Browse titles A–Z, browse by singer, or search by title, singer or song number. Tap a song number to copy it. Works offline after the first visit.
 
 It is a plain static site: no build step is needed to deploy.
 
