@@ -1,5 +1,5 @@
 // Bump VERSION whenever songs.js or index.html changes so phones pick up the new list.
-const VERSION = 'songhub-v4';
+const VERSION = 'songhub-v5';
 const SHELL = ['./', 'index.html', 'songs.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', e => {
