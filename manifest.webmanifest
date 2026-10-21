@@ -1,5 +1,5 @@
 {
-  "name": "SongHub Songbook",
+  "name": "SongHub Songlist",
   "short_name": "SongHub",
   "description": "Browse SongHub karaoke songs by title A–Z or by singer.",
   "start_url": "./",
