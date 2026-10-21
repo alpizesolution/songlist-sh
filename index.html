@@ -105,6 +105,11 @@ mark{background:var(--accent-soft);color:inherit;border-radius:3px;padding:0 1px
 .nudge .go{grid-column:2/4;justify-self:start;margin-top:8px;font:inherit;font-weight:600;font-size:14px;border:0;background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:9px 18px;cursor:pointer}
 .nudge .ico{display:inline-block;vertical-align:-3px;width:16px;height:16px;color:var(--accent)}
 body.has-nudge main{padding-bottom:150px}
+.nudge.mini{left:auto;right:max(12px,env(safe-area-inset-right,0px));grid-template-columns:auto;padding:6px;border-radius:999px;cursor:pointer;gap:0}
+.nudge.mini img{width:40px;height:40px;border-radius:999px;grid-row:auto}
+.nudge.mini>:not(img){display:none}
+.nudge.mini::after{content:"Install app";font-weight:600;font-size:14px;color:var(--accent);padding:0 14px 0 10px;align-self:center}
+.nudge.mini{grid-template-columns:auto auto}
 </style>
 </head>
 <body>
@@ -135,7 +140,7 @@ body.has-nudge main{padding-bottom:150px}
 <aside class="nudge" id="nudge" hidden aria-label="Install SongHub">
   <img src="icons/icon-192.png" alt="">
   <h3 id="nudgeTitle">Install SongHub</h3>
-  <button class="x" id="nudgeClose" type="button" aria-label="Not now">×</button>
+  <button class="x" id="nudgeClose" type="button" aria-label="Minimize">×</button>
   <p id="nudgeText"></p>
   <button class="go" id="nudgeGo" type="button" hidden>Install app</button>
 </aside>
@@ -274,16 +279,16 @@ if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWo
   const android=/Android/.test(ua);
   const macSafari=!ios&&/Macintosh/.test(ua)&&/Version\/1[7-9]|Version\/[2-9]\d/.test(ua)&&/Safari/.test(ua)&&!/Chrome|Chromium|Edg|Firefox/.test(ua);
   const share='<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>';
-  const KEY='songhub.nudgeHidden',WEEK=7*864e5;
-  let snoozed=false;try{snoozed=Date.now()-(+localStorage.getItem(KEY)||0)<WEEK}catch(e){}
   let deferred=null;
-  function show(msg,withButton){if(installed||snoozed)return;text.innerHTML=msg;go.hidden=!withButton;box.hidden=false;document.body.classList.add('has-nudge')}
-  function hide(remember){box.hidden=true;document.body.classList.remove('has-nudge');if(remember)try{localStorage.setItem(KEY,String(Date.now()))}catch(e){}}
-  document.getElementById('nudgeClose').addEventListener('click',()=>hide(true));
+  function show(msg,withButton){if(installed)return;box.classList.remove('mini');text.innerHTML=msg;go.hidden=!withButton;box.hidden=false;document.body.classList.add('has-nudge')}
+  function hide(){box.hidden=true;document.body.classList.remove('has-nudge')}
+  // Closing only shrinks the card to a small pill; it stays until the app is installed.
+  document.getElementById('nudgeClose').addEventListener('click',e=>{e.stopPropagation();box.classList.add('mini')});
+  box.addEventListener('click',e=>{if(box.classList.contains('mini')){box.classList.remove('mini')}});
   addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;
     show(android?'Add it to your home screen. It opens like an app and works without internet.':'Install it on this computer. It opens in its own window and works without internet.',true)});
-  go.addEventListener('click',async()=>{if(!deferred)return;deferred.prompt();const r=await deferred.userChoice;deferred=null;hide(r.outcome!=='accepted')});
-  addEventListener('appinstalled',()=>hide(false));
+  go.addEventListener('click',async()=>{if(!deferred)return;deferred.prompt();const r=await deferred.userChoice;deferred=null;if(r.outcome==='accepted')hide()});
+  addEventListener('appinstalled',hide);
   if(installed)return;
   if(ios){
     const inApp=/FBAN|FBAV|Instagram|Line\/|Messenger/.test(ua);
