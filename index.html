@@ -87,8 +87,8 @@ ul.singers .n{font-family:var(--mono);font-size:12px;color:var(--muted);flex:0 0
 .more:hover{background:var(--ink);color:var(--bg)}
 .empty{color:var(--muted);padding:30px 4px}
 .hint{color:var(--muted);font-size:12px;padding-block:6px 24px;text-align:center}
-.credits{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center;padding-block:18px 32px}
-.credits p{margin:2px 0}
+.brand{min-width:0}
+.credits{margin:6px 0 0;color:var(--muted);font-size:12.5px}
 .credits b{color:var(--ink);font-weight:600}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:999px;font-weight:600;font-size:14px;z-index:20;opacity:0;transition:opacity .2s;pointer-events:none}
 .toast.on{opacity:1}
@@ -110,12 +110,27 @@ body.has-nudge main{padding-bottom:150px}
 .nudge.mini>:not(img){display:none}
 .nudge.mini::after{content:"Install app";font-weight:600;font-size:14px;color:var(--accent);padding:0 14px 0 10px;align-self:center}
 .nudge.mini{grid-template-columns:auto auto}
+.bottomnav{display:none}
+@media (max-width:640px){
+  .tabs{display:none}
+  .bottomnav{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:14;background:var(--surface);border-top:1px solid var(--line);padding:6px max(16px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));gap:8px}
+  .bottomnav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font:inherit;font-size:12px;font-weight:600;border:0;background:none;color:var(--muted);padding:6px 0;border-radius:10px;cursor:pointer}
+  .bottomnav svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .bottomnav button[aria-pressed="true"]{color:var(--accent);background:var(--accent-soft)}
+  main{padding-bottom:72px}
+  body.has-nudge main{padding-bottom:220px}
+  .nudge{bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+  .toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="top">
-    <h1>Song<span>Hub</span></h1>
+    <div class="brand">
+      <h1>Song<span>Hub</span></h1>
+      <p class="credits">SongHub app by <b>Jipe Spd</b> · Website by <b>Alpize Solution</b></p>
+    </div>
     <div class="row"><div class="stats"><b id="nSongs"></b> songs · <b id="nSingers"></b> singers</div></div>
   </header>
 </div>
@@ -133,10 +148,6 @@ body.has-nudge main{padding-bottom:150px}
   <div class="letters" id="letters" role="group" aria-label="Jump to letter"></div>
 </div></div>
 <main class="wrap" id="main"></main>
-<footer class="credits"><div class="wrap">
-  <p>SongHub app developed by <b>Jipe Spd</b></p>
-  <p>Website created by <b>Alpize Solution</b></p>
-</div></footer>
 <aside class="nudge" id="nudge" hidden aria-label="Install SongHub">
   <img src="icons/icon-192.png" alt="">
   <h3 id="nudgeTitle">Install SongHub</h3>
@@ -144,6 +155,10 @@ body.has-nudge main{padding-bottom:150px}
   <p id="nudgeText"></p>
   <button class="go" id="nudgeGo" type="button" hidden>Install app</button>
 </aside>
+<nav class="bottomnav" aria-label="Browse by">
+  <button id="navTitles" type="button" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg><span>Titles</span></button>
+  <button id="navSingers" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>Singers</span></button>
+</nav>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="songs.js"></script>
@@ -185,6 +200,8 @@ function renderLetters(){
   const active=!st.q&&st.singer===null;
   $('letters').innerHTML=LETTERS.map(l=>'<button type="button" data-letter="'+l+'" aria-pressed="'+(active&&st.letter===l)+'"'+(src[l].length?'':' disabled')+' title="'+fmt(src[l].length)+(st.view==='titles'?' songs':' singers')+'">'+l+'</button>').join('');
   $('tabTitles').setAttribute('aria-pressed',st.view==='titles');
+  $('navTitles').setAttribute('aria-pressed',st.view==='titles');
+  $('navSingers').setAttribute('aria-pressed',st.view==='singers');
   $('tabSingers').setAttribute('aria-pressed',st.view==='singers');
 }
 
@@ -250,6 +267,8 @@ function setView(v){st.view=v;st.singer=null;st.q='';$('q').value='';$('clear').
   const src=v==='titles'?titleLetter:singerLetter;if(!src[st.letter].length)st.letter='A';render();top()}
 $('tabTitles').addEventListener('click',()=>setView('titles'));
 $('tabSingers').addEventListener('click',()=>setView('singers'));
+$('navTitles').addEventListener('click',()=>setView('titles'));
+$('navSingers').addEventListener('click',()=>setView('singers'));
 $('letters').addEventListener('click',e=>{const b=e.target.closest('button[data-letter]');if(!b)return;
   st.letter=b.dataset.letter;st.singer=null;st.q='';$('q').value='';$('clear').hidden=true;st.shown=PAGE;render();top()});
 
